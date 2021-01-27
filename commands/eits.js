@@ -200,8 +200,8 @@ module.exports = (request) => {
             Military Sci: ${military}
             Magic Sci: ${magic}
             Cost: ${numeral(cost).format("0,0")}
-            OP: ${numeral(op).format("0,0.0")}
-            DP: ${numeral(dp).format("0,0.0")}
+            OP: ${numeral(op).format("0,0")}
+            DP: ${numeral(dp).format("0,0")}
             
             **Credit**
             made with :heart: by Percy & Moff`,
@@ -231,8 +231,9 @@ module.exports = (request) => {
             Military Sci: ${military}
             Magic Sci: ${magic}
             Cost: ${numeral(cost).format("0,0")}
-            OP: ${numeral(op).format("0,0.0")}
-            DP: ${numeral(dp).format("0,0.0")}
+            OP: ${numeral(op).format("0,0")}
+            DP: ${numeral(dp).format("0,0")}
+            OP for 100%: ${numeral(3*dp).format("0,0")}
             
             **Credit**
             made with :heart: by Percy & Moff`,
