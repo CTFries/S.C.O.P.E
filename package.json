@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "pretty": "prettier --write \"./**/*.{js,jsx,json}\""
   },
   "keywords": [],
@@ -15,7 +15,6 @@
     "numeral": "^2.0.6"
   },
   "devDependencies": {
-    "jest": "^26.6.3",
     "nodemon": "^2.0.4"
   }
 }
