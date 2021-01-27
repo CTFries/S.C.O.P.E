@@ -1,8 +1,9 @@
 const numeral = require("numeral");
+const fieldUtils = require("../resources/field-utils")
 
-module.exports = (client, message, args) => {
-  let userRace = args[0].toLowerCase();
-  let userNum = args[1];
+module.exports = (request) => {
+  let userRace = request.args[0].toLowerCase();
+  let userNum = request.args[1];
   let MTcount, MTrange;
 
   if (userRace == "elf") {
@@ -34,15 +35,20 @@ module.exports = (client, message, args) => {
     }
   }
 
-  message.channel.send({
-    embed: {
-      color: 2123412,
-      description: `Race: ${userRace.replace(/\w\S*/g, function (txt) {
-        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-      })}
-            MT Count: ${numeral(MTcount).format("0,0")}
-            MT Range: ${numeral(MTrange).format("0.00")}`,
-    },
-  });
-  message.delete({ timeout: 1000 });
+  return {
+    deleteOriginalMessage: true,
+    messages: [{
+      embed: {
+        color: 2123412,
+        description: `Race: ${userRace.replace(/\w\S*/g, function (txt) {
+          return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        })}`,
+        fields: [
+          fieldUtils.field("MT Count", numeral(MTcount).format("0,0")),
+          fieldUtils.field("MT Range", numeral(MTrange).format("0.00")),
+        ]
+      },
+    }]
+  };
+
 };

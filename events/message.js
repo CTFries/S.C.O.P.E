@@ -15,5 +15,18 @@ module.exports = (client, message) => {
   let cmd = client.commands.get(command);
   if (!cmd) return;
   console.log(`${command} called by ${message.author} with arguments:${args}`);
-  cmd(client, message, args);
+
+  // only execute the new request/response style
+  // command for the "range" command
+  if (["range"].includes(cmd)) {
+    console.log("executing range command using the new request / response pattern");
+    let request = {authorId: message.author.id, author: message.author, messageString: message.string, args: args};
+    let response = cmd(request);
+    response.messages.forEach(m => message.send(m));
+    if (response.deleteOriginalMessage) message.delete({timeout: 1000});
+
+  } else {
+    cmd(client, message, args);
+  }
+
 };
