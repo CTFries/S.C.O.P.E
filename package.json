@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "pm2 restart 0",
+    "test": "jest",
     "pretty": "prettier --write \"./**/*.{js,jsx,json}\""
   },
   "keywords": [],
@@ -15,6 +16,7 @@
     "numeral": "^2.0.6"
   },
   "devDependencies": {
+    "jest": "^26.6.3",
     "nodemon": "^2.0.4"
   }
 }
