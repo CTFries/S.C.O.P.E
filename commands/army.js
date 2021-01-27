@@ -68,6 +68,12 @@ module.exports = (request) => {
                     OP/DP Ratio: ${numeral(OPDP).format("0.00")}`,
           inline: true,
         },
+        {
+           name: `**OP to Slaughter**`,
+           value: `Total OP: *${numeral(3*DP).format("0,0")}*
+           Additional OP: *${numeral(3*DP-OP).format("0,0")}*`,
+           inline: true, 
+        },
       ],
     },
   };
