@@ -5,6 +5,8 @@ module.exports = (client, message, args) => {
     timeOfCall = message.createdTimestamp;
     //console.log(timeOfCall);
 
+    let messageType = 'NA', requestLocation = 0, requester = 0;
+
     var callDate = new Date(timeOfCall);
     var month = callDate.getMonth();
     var day = callDate.getDate();
@@ -58,7 +60,27 @@ module.exports = (client, message, args) => {
     const schedule = require('node-schedule');
     const date = new Date(year, month, day, hours, minutes, 0);
 
-    const job = schedule.scheduleJob(date, function(){ 
+    if(message.channel.type === 'dm'){
+        messageType = 'DM';
+        requester = message.channel.recipient.id;
+        requestLocation = message.channel.id;
+    }
+
+    if(message.channel.type === 'text'){
+        messageType = 'Text';
+        requestLocation = message.channel.id;
+        requester = message.author.id;
+    }
+
+    const job = schedule.scheduleJob(date, function(){
+        if(messageType === 'DM'){
+            message.channel.id = requestLocation;
+            message.channel.recipient.id = requester;
+        }
+        if(messageType === 'Text'){
+            message.channel.id = requestLocation;
+            message.author.id = requester;
+        }
         message.channel.send({
             embed: {
                color: 2123412,
