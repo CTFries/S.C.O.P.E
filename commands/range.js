@@ -1,4 +1,5 @@
 const numeral = require("numeral");
+const fieldUtils = require("../resources/field-utils")
 
 module.exports = (client, message, args) => {
 
@@ -42,6 +43,7 @@ module.exports = (client, message, args) => {
     });
     message.delete({ timeout: 1000 });
 }
+
 
 
 
