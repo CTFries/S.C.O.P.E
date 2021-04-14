@@ -21,130 +21,94 @@ function raceIdentify(i) {
 }
 
 module.exports = (client, message, args) => {
+
   let op = 0;
+  let endCut = -5, startCut = -5;
   let dp = 0;
   let cost = 0;
   let military = 0;
   let magic = 0;
   let units = [];
   let rawUnits = 0;
-  let rawUnknown = 0;
-  let rawGTs = 0;
-  let rawMTs = 0;
   let GTs = 0;
   let MTs = 0;
   let extraArmies = 0;
   let extraTroops = 0;
-  let tempArray = "N/A",
-    Type = "N/A",
-    interm = "N/A",
-    Owner = "N/A",
-    Target = "N/A",
-    tempEndOwner = "N/A",
-    startTarget = "N/A",
-    endTarget = "N/A",
-    startOwner = "N/A",
-    endOwner = "N/A",
-    tempOwner = "N/A";
+  let Type = 'N/A', interm = 'N/A', Owner = 'N/A', Target='N/A', startTarget='N/A', endTarget='N/A', startOwner='N/A', endOwner='N/A';
 
   if (args[0] >= 0 && args[1] >= 0) {
     military = args[0];
     magic = args[1];
-    tempArray = args.slice(2, args.length).toString().split(`,`);
-  } else {
-    tempArray = args.toString().split(`,`);
+    argArray = args.slice(2,args.length).toString().split('\n').toString().split(',');
+  }else{
+    argArray = args.toString().split('\n').toString().split(',');
   }
 
-  console.log(args);
-  console.log(args.length);
+  //Determine starting and ending cuts
+  for (var i = 0; i < argArray.length; i++) {
+    if(argArray[i] === 'When' && argArray[i+1] ==='casting' && argArray[i+2] === 'the'){
+      endCut = i-1;
+    }
 
-  // Army EITS reports (short)
-  if (args.length < 20) {
-    Type = "Army";
-    rawUnits = args
-      .toString()
-      .split("\n")
-      .slice(1)
-      .toString()
-      .replace("Pony,riders", "Pony riders")
-      .toString()
-      .split(":")
-      .toString()
-      .split(",");
-    rawNames = args.toString().split("\n").slice(0, 1).toString().split(",");
-    console.log(rawUnits);
+    if(argArray[i] === 'Through' && argArray[i+1] === 'the' && argArray[i+2] === 'eye'){
+      startCut = i;
+    }
+  }
 
-    interm = rawNames.indexOf("from");
-    Owner = rawNames
-      .slice(interm + 1)
-      .toString()
-      .split(",")
-      .join(" ");
+  //if no cut is detected, default to starting and ending locations
+  if(startCut === -5){
+    startCut = 0;
+  }
 
-    Target = rawNames.slice(0, interm).toString().split(",").join(" ");
+  if(endCut === -5){
+    endCut = argArray.length;
+  }
+
+  // parse input data according to above
+  argArray = argArray.slice(startCut,endCut);
+
+  if (argArray.length < 30) {
+
+    Type = 'Army';
+
+    rawUnits = argArray.slice(argArray.length-6,argArray.length).toString().replace('Pony,riders','Pony riders').toString().split(':').toString().split(',');
+    
+    rawNames = argArray.slice(0,argArray.length-6).toString().replace(':',',').split(',');
+    intermNames = rawNames.slice(rawNames.indexOf('')+1,rawNames.length);
+
+    Target = intermNames.slice(0,intermNames.indexOf('from')).join(' ');
+
+    Owner = intermNames.slice(intermNames.indexOf('from')+1,intermNames.length).join(' ');
+
   }
   // City EITS reports
   else {
-    Type = "City";
-    rawUnits = args
-      .toString()
-      .split(`\n`)
-      .slice(1, 7)
-      .toString()
-      .replace("Pony,riders", "Pony riders")
-      .toString()
-      .split(":")
-      .toString()
-      .split(",");
-    rawGTs = args
-      .toString()
-      .split(`\n`)
-      .slice(12, 13)
-      .toString()
-      .split(`,`)
-      .slice(1, 2)
-      .toString()
-      .split(`:`);
-    rawMTs = args
-      .toString()
-      .split(`\n`)
-      .slice(11, 12)
-      .toString()
-      .split(`,`)
-      .slice(1, 2)
-      .toString()
-      .split(`:`);
-    rawUnknown = args
-      .toString()
-      .split(`\n`)
-      .slice(19, 20)
-      .toString()
-      .split(`,`);
-    GTs = rawGTs[1];
-    MTs = rawMTs[1];
-    extraArmies = parseInt(rawUnknown[4]);
-    extraTroops = parseInt(rawUnknown[6]);
+
+    Type = 'City';
+
+    argArray = argArray.toString().replace(':',',').split(',');
+
+    startTarget = argArray.indexOf('about');
+    endTarget = argArray.indexOf('');
+    Target = argArray.slice(startTarget + 1, endTarget).join(' ');
+
+    startOwner = argArray.indexOf('by');
+    endOwner = argArray.indexOf('',startOwner);
+    Owner = argArray.slice(startOwner+1,endOwner).join(' ');
+
+    rawUnits = argArray.slice(endOwner+1, endOwner+7).toString().replace('Pony,riders','Pony riders').toString().split(':').toString().split(',');
+    GTs = argArray.slice(endOwner+13,endOwner+15).toString().replace('Guard,Towers:','Guard Towers:').split(':')[1];
+    MTs = argArray.slice(endOwner+11,endOwner+13).toString().replace('Magic,Towers:','Magic Towers:').split(':')[1]
+    extraArmies = argArray.slice(argArray.indexOf('city:')+1,argArray.indexOf('city:')+2).toString().split('(')[0];
+    extraTroops = argArray.slice(argArray.lastIndexOf('') - 2,argArray.lastIndexOf('')-1);
 
     rawUnits.push("GTs", GTs);
-
-    startTarget = tempArray.indexOf("about");
-    endTarget = tempArray.indexOf("");
-    startOwner = tempArray.indexOf("by");
-    // last part of Owner name
-    tempEndOwner = tempArray[tempArray.length - 11]
-      .split(`\n`)[0]
-      .replace(":", "");
-    endOwner = tempArray.length - 11;
-
-    Target = tempArray.slice(startTarget + 1, endTarget).join(" ");
-    tempOwner = tempArray.slice(startOwner + 1, endOwner);
-    tempOwner.push(tempEndOwner);
-
-    Owner = tempOwner.join(" ");
+    
   }
 
-  for (i = 0; i < rawUnits.length / 2; i++) {
-    units[i] = rawUnits[i * 2 + 1];
+
+  for (i = 0; i < (rawUnits.length / 2); i++) {
+    units[i] = rawUnits[(i * 2) + 1];
   }
 
   // Identifies Race
@@ -164,16 +128,14 @@ module.exports = (client, message, args) => {
       // units are base 0, so subtract 1
       op = isNaN(units[i - 1]) ? op : op + units[i - 1] * race[unitI].op;
       dp = isNaN(units[i - 1]) ? dp : dp + units[i - 1] * race[unitI].dp;
-      cost = isNaN(units[i - 1])
-        ? cost
-        : cost + units[i - 1] * race[unitI].cost;
+      cost = isNaN(units[i - 1]) ? cost : cost + units[i - 1] * race[unitI].cost;
     }
   }
   op = military ? op * (1 + military / 10) : op;
   dp = military ? dp * (1 + military / 10) : dp;
-  dp = units[6] > 0 ? dp + units[6] * (5 + parseInt(military)) : dp; // likewise, 6 would be GTs now, not 7
+  dp = units[6] > 0 ? dp + units[6] * (5 + parseInt(military)) : dp;  // likewise, 6 would be GTs now, not 7
 
-  if (Type == "City") {
+  if (Type == 'City') {
     //Output results
     message.channel.send({
       embed: {
@@ -208,7 +170,9 @@ module.exports = (client, message, args) => {
       },
     });
     message.delete({ timeout: 1000 });
+
   } else {
+
     //Output results
     message.channel.send({
       embed: {
@@ -240,5 +204,7 @@ module.exports = (client, message, args) => {
       },
     });
     message.delete({ timeout: 1000 });
+
   }
-};
+
+}
